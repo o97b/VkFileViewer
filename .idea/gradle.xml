@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/database" />
             <option value="$PROJECT_DIR$/fileList" />
+            <option value="$PROJECT_DIR$/fileManager" />
           </set>
         </option>
       </GradleProjectSettings>
