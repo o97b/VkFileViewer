@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.core.model.FileData
 import com.example.filelist.R
 import com.example.filelist.databinding.FileListFragmentBinding
 import com.example.filelist.di.DaggerFileListComponent
@@ -42,6 +43,8 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
 
         setupFileListAdapter()
         setupFileListRecycleView()
+        setupFileListObserver()
+        fetchAllFiles()
     }
 
     private fun fetchAllFiles() {
@@ -58,13 +61,6 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
 
     private fun setupFileListAdapter() {
         fileListAdapter = FileListAdapter()
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                fileListViewModel.fileList.collect { fileListState ->
-                    fileListAdapter?.submitList(fileListState)
-                }
-            }
-        }
     }
 
     private fun setupFileListRecycleView() {
@@ -73,6 +69,31 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
         val columnCount = getColumnCount()
         val gridLayoutManager = GridLayoutManager(context, columnCount)
         binding.fileListView.layoutManager = gridLayoutManager
+    }
+
+    private fun setupFileListObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                fileListViewModel.fileList.collect { fileListState ->
+                    setupScanAnimation(fileListState)
+                    fileListAdapter?.submitList(fileListState)
+                }
+            }
+        }
+    }
+
+    private fun setupScanAnimation(fileListState: List<FileData>) {
+        if (fileListState.isEmpty()) {
+            binding.scanAnimation.apply {
+                playAnimation()
+                visibility = View.VISIBLE
+            }
+        } else {
+            binding.scanAnimation.apply {
+                visibility = View.GONE
+                pauseAnimation()
+            }
+        }
     }
 
     private fun getColumnCount(): Int {
