@@ -7,9 +7,10 @@ import com.example.filemanager.domain.FileManagerRepositoryImpl
 import dagger.Module
 import dagger.Provides
 
-@AppScope
+
 @Module
 class FileManagerModule {
+    @AppScope
     @Provides
     fun provideFileManagerRepository(context: Context): FileManagerRepository {
         return FileManagerRepositoryImpl(context)
