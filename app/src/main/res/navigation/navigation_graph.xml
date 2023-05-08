@@ -3,11 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/fileListFragment">
+    app:startDestination="@id/startFragment">
 
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="com.example.vkfileviewer.ui.StartFragment"
+        android:label="StartFragment"
+        tools:layout="@layout/start_fragment"/>
     <fragment
         android:id="@+id/fileListFragment"
         android:name="com.example.filelist.ui.FileListFragment"
         android:label="FileListFragment"
         tools:layout="@layout/file_list_fragment"/>
+
 </navigation>
