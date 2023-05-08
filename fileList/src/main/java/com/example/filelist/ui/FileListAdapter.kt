@@ -10,6 +10,9 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.core.model.FileData
 import com.example.filelist.R
 import com.example.filelist.databinding.FileItemBinding
+import com.example.filelist.utils.DateFormatter
+import com.example.filelist.utils.FileNameFormatter
+import com.example.filelist.utils.SizeFormatter
 
 internal class FileListAdapter(
 
@@ -31,9 +34,9 @@ internal class FileItem(
 ): RecyclerView.ViewHolder(binding.root) {
     fun bind(fileData: FileData) {
         with(binding) {
-            fileName.text = fileData.displayedName()
-            fileCreationDate.text = fileData.displayedDate()
-            fileSize.text = fileData.displayedSize()
+            fileName.text = FileNameFormatter.format(fileData.name)
+            fileCreationDate.text = DateFormatter.format(fileData.dateCreated)
+            fileSize.text = SizeFormatter.format(fileData.size)
 
             loadIcon(fileData)
         }
