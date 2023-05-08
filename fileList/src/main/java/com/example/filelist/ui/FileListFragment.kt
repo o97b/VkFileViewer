@@ -99,7 +99,10 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
     private fun getColumnCount(): Int {
         val displayMetrics = resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
-        val itemWidth = (64 * resources.displayMetrics.density).toInt()
+        val paddingSizeList =
+            resources.getDimensionPixelSize(com.example.core.R.dimen.padding_size_list)
+        val iconSize = resources.getDimensionPixelSize(com.example.core.R.dimen.icon_size)
+        val itemWidth = (paddingSizeList * 2 + iconSize)
 
         return (screenWidth / itemWidth).coerceAtLeast(1)
     }

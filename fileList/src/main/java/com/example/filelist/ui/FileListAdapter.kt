@@ -5,7 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.core.model.FileData
+import com.example.filelist.R
 import com.example.filelist.databinding.FileItemBinding
 
 internal class FileListAdapter(
@@ -27,9 +30,25 @@ internal class FileItem(
     private val binding: FileItemBinding
 ): RecyclerView.ViewHolder(binding.root) {
     fun bind(fileData: FileData) {
-        binding.fileName.text = fileData.name
-        binding.fileCreationDate.text = fileData.dateCreated.toString()
-        binding.fileSize.text = fileData.size.toString()
+        with(binding) {
+            fileName.text = fileData.displayedName()
+            fileCreationDate.text = fileData.displayedDate()
+            fileSize.text = fileData.displayedSize()
+
+            loadIcon(fileData)
+        }
+    }
+
+    private fun loadIcon(fileData: FileData) {
+        val requestOptions = RequestOptions()
+            .centerCrop()
+            .placeholder(R.drawable.placeholder_image)
+            .error(R.drawable.error_image)
+
+        Glide.with(binding.root)
+            .load(fileData.path)
+            .apply(requestOptions)
+            .into(binding.fileIcon)
     }
 }
 
