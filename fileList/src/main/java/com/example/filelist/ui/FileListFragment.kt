@@ -2,7 +2,11 @@ package com.example.filelist.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,6 +19,7 @@ import com.example.filelist.databinding.FileListFragmentBinding
 import com.example.filelist.di.DaggerFileListComponent
 import com.example.filelist.di.FileListComponent
 import com.example.filelist.di.FileListDepsProvider
+import com.example.filelist.utils.SortingMode
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,14 +46,24 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FileListFragmentBinding.bind(view)
 
+        setupToolBar()
         setupFileListAdapter()
         setupFileListRecycleView()
         setupFileListObserver()
-        fetchAllFiles()
+
+        if (fileListViewModel.fileList.value.isEmpty()) {
+            fetchAllFiles(SortingMode.NAME)
+        }
     }
 
-    private fun fetchAllFiles() {
-        fileListViewModel.fetchAllFiles()
+    private fun setupToolBar() {
+        val toolbar = binding.toolbar
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        setHasOptionsMenu(true)
+    }
+
+    private fun fetchAllFiles(sortingMode: SortingMode) {
+        fileListViewModel.fetchAllFiles(sortingMode)
     }
 
     private fun daggerInjection(context: Context) {
@@ -60,7 +75,7 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
     }
 
     private fun setupFileListAdapter() {
-        fileListAdapter = FileListAdapter()
+        fileListAdapter = FileListAdapter(emptyList())
     }
 
     private fun setupFileListRecycleView() {
@@ -76,7 +91,7 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 fileListViewModel.fileList.collect { fileListState ->
                     setupScanAnimation(fileListState)
-                    fileListAdapter?.submitList(fileListState)
+                    fileListAdapter?.updateList(fileListState)
                 }
             }
         }
@@ -105,6 +120,40 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
         val itemWidth = (paddingSizeList * 2 + iconSize)
 
         return (screenWidth / itemWidth).coerceAtLeast(1)
+    }
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_scan -> {
+                fetchAllFiles(SortingMode.NAME)
+                true
+            }
+            R.id.sort_by_name -> {
+                fileListViewModel.sortList(SortingMode.NAME)
+                true
+            }
+            R.id.sort_by_date -> {
+                fileListViewModel.sortList(SortingMode.DATE)
+                true
+            }
+            R.id.sort_by_size -> {
+                fileListViewModel.sortList(SortingMode.SIZE_INCREASE)
+                true
+            }
+            R.id.sort_by_size_decrease -> {
+                fileListViewModel.sortList(SortingMode.SIZE_DECREASE)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onDestroyView() {

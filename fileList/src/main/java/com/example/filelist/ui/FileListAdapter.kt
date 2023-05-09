@@ -1,9 +1,8 @@
 package com.example.filelist.ui
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -15,18 +14,28 @@ import com.example.filelist.utils.FileNameFormatter
 import com.example.filelist.utils.SizeFormatter
 
 internal class FileListAdapter(
+    private var fileList: List<FileData>
+) : RecyclerView.Adapter<FileItem>() {
 
-): ListAdapter<FileData, FileItem>(FileListDiffCallback()){
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(newFileList: List<FileData>) {
+        fileList = newFileList
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileItem {
         val layoutInflater = LayoutInflater.from(parent.context)
         return FileItem(FileItemBinding.inflate(layoutInflater))
     }
 
     override fun onBindViewHolder(holder: FileItem, position: Int) {
-        val fileData = getItem(position)
+        val fileData = fileList[position]
         holder.bind(fileData)
     }
 
+    override fun getItemCount(): Int {
+        return fileList.size
+    }
 }
 
 internal class FileItem(
@@ -53,15 +62,4 @@ internal class FileItem(
             .apply(requestOptions)
             .into(binding.fileIcon)
     }
-}
-
-internal class FileListDiffCallback : DiffUtil.ItemCallback<FileData>() {
-    override fun areItemsTheSame(oldItem: FileData, newItem: FileData): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(oldItem: FileData, newItem: FileData): Boolean {
-        return oldItem == newItem
-    }
-
 }
