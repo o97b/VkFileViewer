@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.FileData
+import com.example.filelist.utils.FileExtensionUtil
 import com.example.filelist.utils.SortingMode
 import com.example.filemanager.domain.FileManagerRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,8 +22,12 @@ internal class FileListViewModel(
     private val _fileList: MutableStateFlow<List<FileData>> = MutableStateFlow(emptyList())
     val fileList: StateFlow<List<FileData>> = _fileList.asStateFlow()
 
+    private var fetchingJob: Job? = null
+
     fun fetchAllFiles(sortingMode: SortingMode) {
-        viewModelScope.launch(Dispatchers.Default) {
+        if (fetchingJob?.isActive == true) return
+
+        fetchingJob = viewModelScope.launch(Dispatchers.Default) {
             viewModelScope.launch(Dispatchers.Default) {
                 val list = fileManagerRepository
                     .fetchAllFiles()
@@ -43,16 +49,7 @@ internal class FileListViewModel(
             SortingMode.DATE -> compareBy { it.dateCreated }
             SortingMode.SIZE_DECREASE -> compareByDescending { it.size }
             SortingMode.SIZE_INCREASE -> compareBy { it.size }
-            SortingMode.EXTENSION -> compareBy { getFileExtension(it.name) }
-        }
-    }
-
-    private fun getFileExtension(fileName: String): String {
-        val extensionStart = fileName.lastIndexOf('.')
-        return if (extensionStart == -1 || extensionStart == fileName.length - 1) {
-            ""
-        } else {
-            fileName.substring(extensionStart)
+            SortingMode.EXTENSION -> compareBy { FileExtensionUtil.getExtension(it.name) }
         }
     }
 
