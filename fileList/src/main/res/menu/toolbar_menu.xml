@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_scan"
+        android:icon="@drawable/baseline_restart_alt_black"
+        android:title="@string/start_file_scanning"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_sort"
+        android:tooltipText="@string/sort_files"
+        android:title="@string/sort_files"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/sort_by_name"
+                android:title="@string/sort_by_name" />
+            <item
+                android:id="@+id/sort_by_date"
+                android:title="@string/sort_by_date" />
+            <item
+                android:id="@+id/sort_by_size"
+                android:title="@string/sort_by_size" />
+            <item
+                android:id="@+id/sort_by_size_decrease"
+                android:title="@string/sort_by_size_decrease" />
+        </menu>
+    </item>
+
+</menu>

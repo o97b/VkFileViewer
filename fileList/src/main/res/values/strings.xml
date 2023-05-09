@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_file_scanning">Сканирование файлов</string>
+    <string name="sort_files">Sort</string>
+    <string name="sort_by_name">По имени</string>
+    <string name="sort_by_date">По дате</string>
+    <string name="sort_by_size">"По увеличению размера файла"</string>
+    <string name="sort_by_size_decrease">По уменьшению размера файла</string>
+    <string name="toolbar_title">Файлы</string>
+</resources>
