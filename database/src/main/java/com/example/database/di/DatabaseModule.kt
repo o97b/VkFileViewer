@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.example.core.di.AppScope
 import com.example.database.AppDataBase
 import com.example.database.FileDao
+import com.example.database.domain.DataBaseRepository
+import com.example.database.domain.DataBaseRepositoryImpl
 import dagger.Module
 import dagger.Provides
 
@@ -27,6 +29,12 @@ class DatabaseModule {
     @Provides
     fun provideFileDao(appDatabase: AppDataBase): FileDao {
         return appDatabase.fileDao()
+    }
+
+    @AppScope
+    @Provides
+    fun provideDataBaseRepository(fileDao: FileDao): DataBaseRepository {
+        return DataBaseRepositoryImpl(fileDao)
     }
 
 }
