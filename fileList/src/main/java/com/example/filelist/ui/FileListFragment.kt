@@ -152,6 +152,10 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
                 fileListViewModel.sortList(SortingMode.SIZE_DECREASE)
                 true
             }
+            R.id.sort_by_size_extension -> {
+                fileListViewModel.sortList(SortingMode.EXTENSION)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

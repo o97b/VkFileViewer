@@ -25,6 +25,9 @@
             <item
                 android:id="@+id/sort_by_size_decrease"
                 android:title="@string/sort_by_size_decrease" />
+            <item
+                android:id="@+id/sort_by_size_extension"
+                android:title="@string/sort_by_extension" />
         </menu>
     </item>
 

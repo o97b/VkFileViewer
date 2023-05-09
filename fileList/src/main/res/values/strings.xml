@@ -7,4 +7,5 @@
     <string name="sort_by_size">"По увеличению размера файла"</string>
     <string name="sort_by_size_decrease">По уменьшению размера файла</string>
     <string name="toolbar_title">Файлы</string>
+    <string name="sort_by_extension">По расширению</string>
 </resources>
