@@ -1,12 +1,9 @@
 package com.example.filelist.ui
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.core.model.FileData
 import com.example.core.model.FileUi
-import com.example.database.domain.DataBaseRepository
 import com.example.filelist.utils.FileExtensionUtil
 import com.example.filelist.utils.SortingMode
 import com.example.filemanager.domain.FileManagerRepository
@@ -35,14 +32,11 @@ internal class FileListViewModel(
     fun fetchAllFiles(sortingMode: SortingMode) {
         if (fetchingJob?.isActive == true) return
 
-        Log.d("@@@", "1")
-
         fetchingJob = viewModelScope.launch(Dispatchers.Default) {
             _isLoading.value = true
             val list = fileManagerRepository
                 .fetchAllFiles()
                 .sortedWith(getComparatorForSortingMode(sortingMode))
-            Log.d("@@@", "2")
             _fileList.value = list
             _isLoading.value = false
 

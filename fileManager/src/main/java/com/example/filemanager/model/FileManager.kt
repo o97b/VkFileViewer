@@ -1,7 +1,6 @@
 package com.example.filemanager.model
 
 import android.os.Environment
-import android.util.Log
 import com.example.core.model.FileData
 import com.example.core.model.FileUi
 import com.example.core.model.toFileData
@@ -29,7 +28,6 @@ class FileManager @Inject constructor(
         val fileList: MutableList<FileUi> = mutableListOf()
         val root = Environment.getExternalStorageDirectory()
         fetchFiles(root, fileList)
-        Log.d("@@@", fileList.size.toString())
         return fileList
     }
 
@@ -42,11 +40,9 @@ class FileManager @Inject constructor(
             it.join()
             dataBaseRepository.clearFileHashesTable()
             val currentFileEntities = fileDataListCopy?.map { fileData -> fileData.toFileEntity() }
-            Log.d("@@@","11 " + "currentFileEntities?.size.toString()")
             currentFileEntities?.let {fileEntitiesList ->
                 dataBaseRepository.insertFileHashes(fileEntitiesList)
             }
-            Log.d("@@@","11 " + currentFileEntities?.size.toString())
         }
     }
 
@@ -69,7 +65,6 @@ class FileManager @Inject constructor(
             var i = 0
             for (fileData in fileDataList ?: emptyList()) {
                 i++
-                Log.d("@@@", i.toString())
                 if (!fileEntitiesHashSet.contains(fileData.hash)) {
                     modifiedFiles.add(fileData.toFileUi())
                 }
@@ -89,7 +84,6 @@ class FileManager @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     private suspend fun setFileDataList(currentFiles: List<FileUi>) {
-        Log.d("@@@", "modifiedFiles.size.toString()")
 
         val deferred = CompletableDeferred<List<FileData>>()
 
