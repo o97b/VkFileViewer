@@ -13,7 +13,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.core.model.FileData
 import com.example.filelist.R
 import com.example.filelist.databinding.FileListFragmentBinding
 import com.example.filelist.di.DaggerFileListComponent
@@ -50,6 +49,7 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
         setupFileListAdapter()
         setupFileListRecycleView()
         setupFileListObserver()
+        setupScanAnimation()
 
         if (fileListViewModel.fileList.value.isEmpty()) {
             fetchAllFiles(SortingMode.NAME)
@@ -90,23 +90,30 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 fileListViewModel.fileList.collect { fileListState ->
-                    setupScanAnimation(fileListState)
                     fileListAdapter?.updateList(fileListState)
                 }
             }
         }
     }
 
-    private fun setupScanAnimation(fileListState: List<FileData>) {
-        if (fileListState.isEmpty()) {
-            binding.scanAnimation.apply {
-                playAnimation()
-                visibility = View.VISIBLE
-            }
-        } else {
-            binding.scanAnimation.apply {
-                visibility = View.GONE
-                pauseAnimation()
+    private fun setupScanAnimation() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                fileListViewModel.isScanning.collect { isScanning ->
+                    if (isScanning) {
+                        binding.apply {
+                            scanAnimation.playAnimation()
+                            fileListView.visibility = View.GONE
+                            scanAnimation.visibility = View.VISIBLE
+                        }
+                    } else {
+                        binding.apply {
+                            scanAnimation.visibility = View.GONE
+                            scanAnimation.pauseAnimation()
+                            fileListView.visibility = View.VISIBLE
+                        }
+                    }
+                }
             }
         }
     }
@@ -132,8 +139,12 @@ class FileListFragment: Fragment(R.layout.file_list_fragment) {
     @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_show_changes -> {
+                fileListViewModel.fetchModifiedFiles()
+                true
+            }
             R.id.action_scan -> {
-                fetchAllFiles(SortingMode.NAME)
+                fileListViewModel.fetchAllFiles(SortingMode.NAME)
                 true
             }
             R.id.sort_by_name -> {

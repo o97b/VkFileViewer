@@ -1,15 +1,32 @@
 package com.example.filemanager.domain
 
-import android.content.Context
-import com.example.core.model.FileData
+import com.example.core.model.FileUi
 import com.example.filemanager.model.FileManager
+import javax.inject.Inject
 
 interface FileManagerRepository {
-    fun fetchAllFiles(): List<FileData>
+    suspend fun fetchAllFiles(): List<FileUi>
+
+    suspend fun getModifiedFileUi(currentFileUi: List<FileUi>): List<FileUi>
+
+    suspend fun updateHashes(currentFileUi: List<FileUi>)
 }
 
-class FileManagerRepositoryImpl(private val context: Context) : FileManagerRepository {
-    override fun fetchAllFiles(): List<FileData> {
-        return FileManager(context).fetchAllFiles()
+class FileManagerRepositoryImpl @Inject constructor(
+    private val fileManager: FileManager
+) : FileManagerRepository {
+
+    override suspend fun fetchAllFiles(): List<FileUi> {
+        return fileManager.fetchFileUi()
     }
+
+    override suspend fun getModifiedFileUi(currentFileUi: List<FileUi>): List<FileUi> {
+        return fileManager.getModifiedFileUi(currentFileUi)
+    }
+
+    override suspend fun updateHashes(currentFileUi: List<FileUi>) {
+        fileManager.updateHashes(currentFileUi)
+    }
+
+
 }

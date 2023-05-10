@@ -8,9 +8,13 @@ import com.example.database.entities.FileEntity
 
 @Dao
 interface FileDao {
+
     @Query("SELECT * FROM files")
-    suspend fun getFileHashes(): List<FileEntity>
+    fun getAllFileHashes(): List<FileEntity>?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFileHashes(files: List<FileEntity>)
+    suspend fun insertFileHashes(files: List<FileEntity>?)
+
+    @Query("DELETE FROM files")
+    suspend fun clearFileHashesTable()
 }

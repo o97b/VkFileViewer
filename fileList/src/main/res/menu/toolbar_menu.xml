@@ -3,6 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_show_changes"
+        android:title="@string/file_changed"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_scan"
         android:icon="@drawable/baseline_restart_alt_black"
         android:title="@string/start_file_scanning"

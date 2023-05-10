@@ -39,4 +39,7 @@ dependencies {
     // Dagger
     implementation("com.google.dagger:dagger:$dagger_version")
     kapt("com.google.dagger:dagger-compiler:$dagger_version")
+
+    // Okio for file hash
+    implementation("com.squareup.okio:okio:3.3.0")
 }

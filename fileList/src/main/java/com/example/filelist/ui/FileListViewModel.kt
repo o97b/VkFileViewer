@@ -1,9 +1,12 @@
 package com.example.filelist.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.core.model.FileData
+import com.example.core.model.FileUi
+import com.example.database.domain.DataBaseRepository
 import com.example.filelist.utils.FileExtensionUtil
 import com.example.filelist.utils.SortingMode
 import com.example.filemanager.domain.FileManagerRepository
@@ -16,24 +19,60 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class FileListViewModel(
-    private val fileManagerRepository: FileManagerRepository
+    private val fileManagerRepository: FileManagerRepository,
 ): ViewModel() {
 
-    private val _fileList: MutableStateFlow<List<FileData>> = MutableStateFlow(emptyList())
-    val fileList: StateFlow<List<FileData>> = _fileList.asStateFlow()
+    private val _fileList: MutableStateFlow<List<FileUi>> = MutableStateFlow(emptyList())
+    val fileList: StateFlow<List<FileUi>> = _fileList.asStateFlow()
+
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val isScanning: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private var fetchingJob: Job? = null
+    private var updatingJob: Job? = null
+    private var fetchingModifiedFilesJob: Job? = null
 
     fun fetchAllFiles(sortingMode: SortingMode) {
         if (fetchingJob?.isActive == true) return
 
-        fetchingJob = viewModelScope.launch(Dispatchers.Default) {
-            viewModelScope.launch(Dispatchers.Default) {
-                val list = fileManagerRepository
-                    .fetchAllFiles()
-                    .sortedWith(getComparatorForSortingMode(sortingMode))
+        Log.d("@@@", "1")
 
-                _fileList.value = list
+        fetchingJob = viewModelScope.launch(Dispatchers.Default) {
+            _isLoading.value = true
+            val list = fileManagerRepository
+                .fetchAllFiles()
+                .sortedWith(getComparatorForSortingMode(sortingMode))
+            Log.d("@@@", "2")
+            _fileList.value = list
+            _isLoading.value = false
+
+            updateFileHashes()
+        }
+
+    }
+
+    private fun updateFileHashes() {
+        if (updatingJob?.isActive == true) return
+
+        updatingJob = viewModelScope.launch(Dispatchers.Default) {
+            fetchingJob?.let {
+                it.join()
+                val currentFiles = fileList.value
+                fileManagerRepository.updateHashes(currentFiles)
+            }
+        }
+    }
+
+    fun fetchModifiedFiles() {
+        if (fetchingModifiedFilesJob?.isActive == true) return
+
+        fetchingModifiedFilesJob = viewModelScope.launch(Dispatchers.Default) {
+            fetchingJob?.let {
+                it.join()
+                _isLoading.value = true
+                _fileList.value =
+                    fileManagerRepository.getModifiedFileUi(fileList.value)
+                _isLoading.value = false
             }
         }
     }
@@ -43,7 +82,7 @@ internal class FileListViewModel(
         _fileList.value = list.sortedWith(getComparatorForSortingMode(sortingMode))
     }
 
-    private fun getComparatorForSortingMode(sortingMode: SortingMode): Comparator<FileData> {
+    private fun getComparatorForSortingMode(sortingMode: SortingMode): Comparator<FileUi> {
         return when (sortingMode) {
             SortingMode.NAME -> compareBy { it.name }
             SortingMode.DATE -> compareBy { it.dateCreated }
